@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane style="-fx-background-color: #15202b;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo1.View.TimelineViewController">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #192734; -fx-padding: 15 20;">
+            <Label style="-fx-text-fill: #1da1f2; -fx-font-size: 20; -fx-font-weight: bold;" text="🐦 X Simulator" />
+            <Label fx:id="lblUserInfo" style="-fx-text-fill: white; -fx-font-size: 14;" />
+            <Label fx:id="lblTokens" style="-fx-text-fill: #00ff9d; -fx-font-size: 12;" />
+
+            <Button onAction="#handleViewProfile" style="-fx-background-color: transparent; -fx-text-fill: #1da1f2; -fx-cursor: hand;" text="👤 Profile" />
+            <Button onAction="#handleSearch" style="-fx-background-color: transparent; -fx-text-fill: #1da1f2; -fx-cursor: hand;" text="🔍 Search" />
+            <Button onAction="#handleLogout" style="-fx-background-color: #e0245e; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-cursor: hand;" text="🚪 Logout" />
+        </HBox>
+    </top>
+    <left>
+        <VBox spacing="10" style="-fx-background-color: #192734; -fx-padding: 20 10; -fx-pref-width: 180;">
+            <Button onAction="#handleRefresh" style="-fx-background-color: #1da1f2; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8; -fx-cursor: hand;" text="🏠 Home" />
+            <Button onAction="#handleRefresh" style="-fx-background-color: transparent; -fx-text-fill: #8899a6; -fx-padding: 8; -fx-cursor: hand;" text="🔄 Refresh" />
+
+            <Label style="-fx-text-fill: #8899a6; -fx-font-size: 12; -fx-padding: 10 0 0 0;" text="Sort by:" />
+            <ChoiceBox fx:id="choiceSortBy" prefWidth="150" style="-fx-background-color: #253341; -fx-text-fill: white;" />
+        </VBox>
+    </left>
+    <center>
+        <VBox spacing="15" style="-fx-padding: 20;">
+
+            <VBox spacing="10" style="-fx-background-color: #192734; -fx-background-radius: 15; -fx-padding: 15;">
+                <TextArea fx:id="txtNewPost" prefRowCount="3" promptText="What's happening?" style="-fx-background-color: #253341; -fx-text-fill: white; -fx-background-radius: 10;" />
+                <TextField fx:id="txtNewHashtags" promptText="Hashtags" style="-fx-background-color: #253341; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 12;" />
+                <HBox alignment="CENTER_RIGHT">
+                    <Button onAction="#handleCreatePost" style="-fx-background-color: #1da1f2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="📤 Post" />
+                </HBox>
+            </VBox>
+
+            <ScrollPane fx:id="scrollPane" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                <VBox fx:id="timelineContainer" spacing="15" style="-fx-background-color: transparent;">
+                    <padding>
+                        <Insets bottom="20" />
+                    </padding>
+                </VBox>
+            </ScrollPane>
+
+        </VBox>
+    </center>
+
+</BorderPane>
