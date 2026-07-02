@@ -1,6 +1,10 @@
 package com.example.demo1.Controller;
 
 import com.example.demo1.Model.*;
+import com.example.demo1.Network.ChatClient;
+import com.example.demo1.Network.NetworkPacket;
+import com.example.demo1.Network.RequestType;
+
 import java.util.regex.Pattern;
 import java.util.List;
 
@@ -24,7 +28,6 @@ public class XControllers {
         public String register(String username, String password, String email, String phone, String firstName, String lastname, String accountType) {
             String cleanUsername = (username != null) ? username.trim() : "";
             if (cleanUsername.isEmpty()) return "Error: Username cannot be empty!";
-            if (db.getUserByUsername(cleanUsername) != null) return "Error: Username exists!";
             if (!isValidEmail(email)) return "Error: Invalid email format!";
             if (!isValidPhone(phone)) return "Error: Invalid phone format!";
             if (!isValidPassword(password))
@@ -37,31 +40,31 @@ public class XControllers {
                 default -> new NormalUser(cleanUsername, password, email, phone, firstName, lastname);
             };
 
-            db.addUser(newUser);
-            String successMessage = "Success: " + type + " account created!";
+            try {
+                NetworkPacket registerPacket = new NetworkPacket(RequestType.REGISTER, newUser);
+                NetworkPacket response = ChatClient.getInstance().sendRequest(registerPacket);
 
-            List<Hashtag> popular = db.getPopularHashtags();
-            StringBuilder hs = new StringBuilder();
-            for (int i = 0; i < Math.min(4, popular.size()); i++)
-                hs.append("\n   ").append(i+1).append(". ").append(popular.get(i).getTitle());
-            return successMessage + "\npopular hashtags: " + hs;
+                if (!response.isSuccess()) {
+                    return "Error: " + response.getStatusMessage();
+                }
+
+                return "Success: " + type + " account created!";
+
+            } catch (Exception e) {
+                return "Error: Connection to server failed! " + e.getMessage();
+            }
         }
+
         public User login(String username, String password) throws Exception {
-            User user = db.getUserByUsername(username);
+            String[] credentials = new String[]{username, password};
+            NetworkPacket loginPacket = new NetworkPacket(RequestType.LOGIN, credentials);
+            NetworkPacket response = ChatClient.getInstance().sendRequest(loginPacket);
 
-            if (user == null) {
-                throw new Exception("USER_NOT_FOUND");
+            if (!response.isSuccess()) {
+                throw new Exception(response.getStatusMessage());
             }
-            if (!user.getPassword().equals(password)) {
-                throw new Exception("WRONG_PASSWORD");
-            }
-            if (user.isLocked()) {
-                throw new Exception("ACCOUNT_LOCKED");
-            }
-
-            return user;
+            return (User) response.getData();
         }
-
         public boolean adminLogin(String username, String password) {
             Admin admin = db.getAdmin();
             return admin.getUsername().equals(username) && admin.getPassword().equals(password);

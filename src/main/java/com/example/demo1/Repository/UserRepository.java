@@ -1,10 +1,10 @@
-package com.example.demo1.Repository;// امپورت مدل‌ها و کلاس‌های فرزند کاربر
+package com.example.demo1.Repository;
 import com.example.demo1.Model.BlueUser;
 import com.example.demo1.Model.GoldUser;
 import com.example.demo1.Model.NormalUser;
 import com.example.demo1.Model.User;
-import com.example.demo1.Repository.DatabaseConnection;
-import com.example.demo1.interfaces.IRepository;
+import com.example.demo1.Interfaces.IRepository;
+import com.example.demo1.Model.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,6 @@ public class UserRepository implements IRepository<User> {
             stmt.setString(3, user.getPassword());
             stmt.setString(4, user.getBio());
 
-            // تشخیص نوع کلاس فرزند برای ذخیره در دیتابیس
             String typeStr = "NORMAL";
             if (user instanceof BlueUser) {
                 typeStr = "BLUE";
@@ -43,7 +42,6 @@ public class UserRepository implements IRepository<User> {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    // استفاده از متد کمکی برای نیو کردن کلاس فرزند درست
                     return mapUser(rs);
                 }
             }
@@ -65,12 +63,10 @@ public class UserRepository implements IRepository<User> {
         return users;
     }
 
-    // --- متد کمکی برای حل مشکل ابسترکت بودن کلاس User ---
     private User mapUser(ResultSet rs) throws SQLException {
         String type = rs.getString("user_type");
         User user;
 
-        // بر اساس تایپ ذخیره شده در دیتابیس، کلاس فرزند متناظر را نیو می‌کنیم و دیتای فاز اولت را اورراید یا مقداردهی می‌کنیم
         switch (type) {
             case "BLUE":
                 user = new BlueUser(rs.getString("username"), rs.getString("email"), rs.getString("password"));
@@ -84,8 +80,7 @@ public class UserRepository implements IRepository<User> {
                 break;
         }
 
-        // پر کردن سایر فیلدهای مشترک کلاس ابسترکت کامنت شده یا عمومی
-        user.setId(rs.getInt("id")); // اگر متد setId در کلاس والد داری
+        user.setId(rs.getInt("id"));
         user.setBio(rs.getString("bio"));
         return user;
     }
@@ -110,5 +105,50 @@ public class UserRepository implements IRepository<User> {
             stmt.setInt(3, user.getId());
             stmt.executeUpdate();
         }
+    }
+
+    public User findByUsername(String username) {
+        String query = "SELECT * FROM users WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+                    String usernameFromDb = rs.getString("username");
+                    String password = rs.getString("password");
+                    String email = rs.getString("email");
+                    String type = rs.getString("user_type");
+
+                    if ("blue".equalsIgnoreCase(type)) {
+                        BlueUser blueUser = new BlueUser(usernameFromDb, password, email);
+                        blueUser.setId(id);
+                        return blueUser;
+                    } else if ("gold".equalsIgnoreCase(type)) {
+                        GoldUser goldUser = new GoldUser(usernameFromDb, password, email);
+                        goldUser.setId(id);
+                        return goldUser;
+                    } else { String phone = "";
+                        String firstName = "";
+                        String lastName = "";
+                        try {
+                            phone = rs.getString("phone");
+                            firstName = rs.getString("firstName");
+                            lastName = rs.getString("lastName");
+                        } catch (Exception e) {
+                        }
+
+                        NormalUser normalUser = new NormalUser(usernameFromDb, password, email, phone, firstName, lastName);
+                        normalUser.setId(id);
+                        return normalUser;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in findByUsername: " + e.getMessage());
+        }
+        return null;
     }
 }

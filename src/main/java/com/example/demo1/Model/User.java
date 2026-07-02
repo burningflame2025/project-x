@@ -1,11 +1,12 @@
 package com.example.demo1.Model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 //========user=========
-public abstract class User {
+public abstract class User implements Serializable {
     private static int nextId = 1;
 
     int id;

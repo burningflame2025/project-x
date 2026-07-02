@@ -22,8 +22,6 @@ public class LoginViewController {
     private void initialize() {
         controller = new XControllers.AuthController();
     }
-
-    // در LoginViewController.java
     @FXML
     public void handleLogin(ActionEvent event) {
         String username = txtUsername.getText().trim();
@@ -34,20 +32,12 @@ public class LoginViewController {
             return;
         }
 
-        // ۱. بررسی از طریق AuthController
-        User user = authController.login(username, password);
-
-        if (user != null) {
-            // ۲. چک کردن قفل نبودن کاربر توسط ادمین (شرط پی‌دی‌اف فاز اول)
-            if (user.isLocked()) {
-                showMessage("This account has been suspended by Admin!", Color.RED);
-                return;
-            }
-
-            // ورود موفقیت‌آمیز کاربر عادی به تایم‌لاین
+        try {
+            User user = controller.login(username, password);
             XApplication.showTimelineView(user);
-        } else {
-            showMessage("Invalid username or password.", Color.RED);
+
+        } catch (Exception e) {
+            showMessage(e.getMessage(), Color.RED);
         }
     }
 
@@ -56,7 +46,6 @@ public class LoginViewController {
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText().trim();
 
-        // بررسی اطلاعات ادمین بر اساس الگوی Singleton دیتابیس پروژه
         if (com.example.demo1.Model.Admin.getInstance().login(username, password)) {
             XApplication.showAdminDashboard();
         } else {

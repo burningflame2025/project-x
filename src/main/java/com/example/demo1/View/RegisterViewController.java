@@ -26,7 +26,6 @@ public class RegisterViewController {
     @FXML
     public void initialize() {
         authController = new XControllers.AuthController();
-        // اصلاح طبق مستندات: اطمینان از مقداردهی اولیه درست ChoiceBox
         choiceAccountType.getItems().setAll("Normal", "Blue", "Gold");
         choiceAccountType.setValue("Normal");
     }
@@ -42,20 +41,17 @@ public class RegisterViewController {
         String confirmedPassword = txtConfirmPassword.getText().trim();
         String accountType = choiceAccountType.getValue();
 
-        // 1. اعتبارسنجی کامل فیلدها (طبق پی‌دی‌اف، تمام فیلدها باید اجباری باشند)
         if (firstname.isEmpty() || lastname.isEmpty() || username.isEmpty() ||
-                email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
+                email.isEmpty() || phone.isEmpty() || password.isEmpty() || accountType == null) {
             showMessage("All fields are required!", Color.RED);
             return;
         }
 
-        // 2. تطابق پسورد
         if (!password.equals(confirmedPassword)) {
             showMessage("Passwords do not match!", Color.RED);
             return;
         }
 
-        // 3. استفاده از اعتبارسنج‌های کنترلر
         if (!authController.isValidPassword(password)) {
             showMessage("Password must be at least 8 characters, with letters and numbers.", Color.RED);
             return;
@@ -68,16 +64,12 @@ public class RegisterViewController {
             showMessage("Invalid phone number format!", Color.RED);
             return;
         }
-
-        choiceAccountType.getItems().setAll("Normal", "Blue", "Gold");
-        String result = authController.register(username, password, email, phone, firstname, lastname, choiceAccountType.getValue());
+        String result = authController.register(username, password, email, phone, firstname, lastname, accountType);
 
         if (result.startsWith("Success")) {
-            // نمایش پیام موفقیت‌آمیز به کاربر قبل از تغییر صفحه
             showMessage("Registration successful!", Color.GREEN);
             XApplication.showLoginView();
         } else {
-            // نمایش خطاهای احتمالی از سمت کنترلر (مثلاً نام کاربری تکراری)
             showMessage(result, Color.RED);
         }
     }

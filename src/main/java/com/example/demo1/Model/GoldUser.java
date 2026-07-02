@@ -4,7 +4,7 @@ package com.example.demo1.Model;
 public class GoldUser extends PremiumUser {
 
     public GoldUser(String username, String password, String email) {
-        super(username, password, email, phone, firstName, lastName);
+        super(username, password, email, "", "", "");
         this.setTokens(600);
     }
 

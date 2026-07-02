@@ -37,7 +37,6 @@ public class ClientHandler implements Runnable {
                 out.writeObject(response);
                 out.flush();
 
-                // اگر کلاینت درخواست دیسکنکت داد، حلقه را می‌شکنیم
                 if (request.getRequestType() == RequestType.DISCONNECT) {
                     break;
                 }
@@ -54,14 +53,29 @@ public class ClientHandler implements Runnable {
         try {
             switch (request.getRequestType()) {
                 case LOGIN:
-                    User loginData = (User) request.getData();
-                    User foundUser = userRepository.findById(loginData.getId());
-                    if (foundUser != null && foundUser.getPassword().equals(loginData.getPassword())) {
-                        this.loggedInUser = foundUser;
-                        return new NetworkPacket(RequestType.LOGIN, foundUser, true, "welcome");
-                    }
-                    return new NetworkPacket(RequestType.LOGIN, null, false, "wrong password or username.");
+                    String[] credentials = (String[]) request.getData();
+                    String username = credentials[0];
+                    String password = credentials[1];
+                    User foundUser = userRepository.findByUsername(username);
 
+                    if (foundUser == null) {
+                        return new NetworkPacket(RequestType.LOGIN, null, false, "User not found!");
+                    } else if (!foundUser.getPassword().equals(password)) {
+                        return new NetworkPacket(RequestType.LOGIN, null, false, "Wrong password!");
+                    } else if (foundUser.isLocked()) {
+                        return new NetworkPacket(RequestType.LOGIN, null, false, "This account is suspended!");
+                    }
+
+                    return new NetworkPacket(RequestType.LOGIN, foundUser, true, "Success");
+
+                case REGISTER:
+                    User newUser = (User) request.getData();
+                    if (userRepository.findByUsername(newUser.getUsername()) != null) {
+                        return new NetworkPacket(RequestType.REGISTER, null, false, "Username already exists!");
+                    } else {
+                        userRepository.add(newUser);
+                        return new NetworkPacket(RequestType.REGISTER, null, true, "Registration Successful");
+                    }
                 case SEND_MESSAGE:
                     ChatMessage msg = (ChatMessage) request.getData();
                     messageRepository.add(msg);

@@ -5,9 +5,9 @@ import java.sql.SQLException;
 import java.sql.Connection;
 
 public class DatabaseConnection {
-    private static final String URL = "jdbc:mysql://localhost:3000/project_x"; // پورت و نام دیتابیس خودت را چک کن
-    private static final String USERNAME = "root"; // نام کاربری دیتابیس شما
-    private static final String PASSWORD = "TradeSystem123!"; // رمز عبور دیتابیس شما
+    private static final String URL = "jdbc:mysql://localhost:3306/project_x?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "TradeSystem123!";
 
     public static Connection getConnection() throws SQLException {
         try {
