@@ -7,12 +7,11 @@ import java.util.Iterator;
 
 public class ChatMessage implements Iterable<String> {
     private int id;
-    private int senderId;     // آیدی فرستنده پیام
-    private int receiverId;   // آیدی گیرنده پیام
+    private int senderId;
+    private int receiverId;
     private String messageText;
-    private Date sentDate;    // زمان ارسال پیام
+    private Date sentDate;
 
-    // سازنده کامل (برای زمانی که داده رو از دیتابیس می‌خوانیم و آیدی دارد)
     public ChatMessage(int id, int senderId, int receiverId, String messageText, Date sentDate) {
         this.id = id;
         this.senderId = senderId;
@@ -21,12 +20,11 @@ public class ChatMessage implements Iterable<String> {
         this.sentDate = sentDate;
     }
 
-    // سازنده فرعی (برای زمانی که کلاینت پیام جدید می‌سازد و هنوز آیدی دیتابیس ندارد)
     public ChatMessage(int senderId, int receiverId, String messageText) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.messageText = messageText;
-        this.sentDate = new Date(); // زمان فعلی سیستم
+        this.sentDate = new Date();
     }
 
     // Getters و Setters
@@ -41,13 +39,15 @@ public class ChatMessage implements Iterable<String> {
 
     public Date getSentDate() { return sentDate; }
 
-    // پیاده‌سازی الزامی Iterable برای فاز ۲ (پیمایش روی کلمات پیام)
     @Override
     public Iterator<String> iterator() {
         if (this.messageText == null || this.messageText.trim().isEmpty()) {
             return Collections.emptyIterator();
         }
-        // شکستن متن پیام به کلمات (بر اساس فاصله‌ها) برای استفاده در حلقه foreach
         return Arrays.asList(this.messageText.split("\\s+")).iterator();
+    }
+
+    public String getText() {
+        return this.messageText;
     }
 }
