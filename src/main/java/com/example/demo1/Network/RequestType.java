@@ -9,5 +9,5 @@ public enum RequestType {
     LIKE_POST,
     FOLLOW,
     UNFOLLOW,
-    DISCONNECT
+    DISCONNECT,
 }
